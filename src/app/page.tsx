@@ -3,8 +3,9 @@
 import { useTransactions } from "@/hooks/useTransactions";
 import { formatCurrency, formatDate, statusLabel, typeLabel } from "@/lib/formatters";
 import type { Transaction, TransactionType, TransactionStatus } from "@/types/transaction";
-import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";// nuevo import:
+import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
 import { TransactionFiltersBar } from "@/components/ui/transactions/TransactionFiltersBar";
+import { TransactionEmpty } from "@/components/ui/transactions/TransactionEmpty";
 import {
   Table,
   TableBody,
@@ -19,11 +20,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+
 const amountColor: Record<TransactionType, string> = {
   credit: "text-emerald-600",
   debit: "text-red-600",
 };
-
 
 const statusBadge: Record<TransactionStatus, string> = {
   completed: "bg-emerald-100 text-emerald-700",
@@ -42,19 +43,33 @@ function maskAccount(account: string): string {
 
 export default function HomePage() {
   const { data, loading, error, page, pageSize, filters, update } = useTransactions();
-  
-  if (loading && !data ) return <p className="p-6">Cargando...</p>;
-  if (error) return <p className="p-6 text-red-500">{error}</p>;
+
+  if (loading && !data) return <p className="p-6">Cargando...</p>;
+  if (error && !data) return (
+    <div className="p-6 text-center">
+      <p className="text-red-500 mb-2">{error}</p>
+      <button
+        onClick={() => update({ page: 1 })}
+        className="text-sm text-[#FC2B60] underline"
+      >
+        Reintentar
+      </button>
+    </div>
+  );
+
+  const hasFilters = Object.values(filters).some((v) => v !== undefined && v !== "");
 
   return (
     <TooltipProvider>
       <main className="p-4 md:p-6 lg:p-8 w-full">
         <h1 className="text-xl font-semibold mb-4">Historial de transacciones</h1>
+
         <TransactionFiltersBar
-  filters={filters}
-  onChange={(f) => update({ filters: f, page: 1 })}
-  onClear={() => update({ filters: {}, page: 1 })}
-/>
+          filters={filters}
+          onChange={(f) => update({ filters: f, page: 1 })}
+          onClear={() => update({ filters: {}, page: 1 })}
+        />
+
         <div className="rounded-lg border shadow-sm overflow-hidden">
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             <Table>
@@ -69,46 +84,57 @@ export default function HomePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(data?.items ?? []).map((tx: Transaction, i: number) => {
-                  const isFailed = tx.status === "failed";
-                  return (
-                    <TableRow
-                      key={tx.id}
-                      className={`${isFailed ? rowFailed : "hover:bg-zinc-50"} ${i % 2 === 1 ? "bg-zinc-50/50" : ""}`}
-                    >
-                      <TableCell className={isFailed ? cellFailed : undefined}>
-                        {formatDate(tx.date)}
-                      </TableCell>
-                      <TableCell className={isFailed ? cellFailed : undefined}>
-                        {tx.description}
-                      </TableCell>
-                      <TableCell className={isFailed ? cellFailed : undefined}>
-                        {typeLabel(tx.type)}
-                      </TableCell>
-                      <TableCell>
-                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFailed ? cellFailed : statusBadge[tx.status]}`}>
-                          {statusLabel(tx.status)}
-                        </span>
-                      </TableCell>
-                      <TableCell className={`text-right font-mono tabular-nums ${isFailed ? cellFailed : amountColor[tx.type]}`}>
-                        {tx.type === "debit" ? "-" : "+"}
-                        {formatCurrency(tx.amount, tx.currency)}
-                      </TableCell>
-                      <TableCell>
-                        <Tooltip>
-                          <TooltipTrigger className="cursor-default">
-                            <span className={isFailed ? cellFailed : "text-zinc-500"}>
-                              {maskAccount(tx.accountOrigin)}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>{tx.accountOrigin}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
+                {(data?.items ?? []).length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="border-0">
+                      <TransactionEmpty
+                        hasFilters={hasFilters}
+                        onClear={() => update({ filters: {}, page: 1 })}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  (data?.items ?? []).map((tx: Transaction, i: number) => {
+                    const isFailed = tx.status === "failed";
+                    return (
+                      <TableRow
+                        key={tx.id}
+                        className={`${isFailed ? rowFailed : "hover:bg-zinc-50"} ${i % 2 === 1 ? "bg-zinc-50/50" : ""}`}
+                      >
+                        <TableCell className={isFailed ? cellFailed : undefined}>
+                          {formatDate(tx.date)}
+                        </TableCell>
+                        <TableCell className={isFailed ? cellFailed : undefined}>
+                          {tx.description}
+                        </TableCell>
+                        <TableCell className={isFailed ? cellFailed : undefined}>
+                          {typeLabel(tx.type)}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFailed ? cellFailed : statusBadge[tx.status]}`}>
+                            {statusLabel(tx.status)}
+                          </span>
+                        </TableCell>
+                        <TableCell className={`text-right font-mono tabular-nums ${isFailed ? cellFailed : amountColor[tx.type]}`}>
+                          {tx.type === "debit" ? "-" : "+"}
+                          {formatCurrency(tx.amount, tx.currency)}
+                        </TableCell>
+                        <TableCell>
+                          <Tooltip>
+                            <TooltipTrigger className="cursor-default">
+                              <span className={isFailed ? cellFailed : "text-zinc-500"}>
+                                {maskAccount(tx.accountOrigin)}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{tx.accountOrigin}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
               </TableBody>
             </Table>
           </div>
