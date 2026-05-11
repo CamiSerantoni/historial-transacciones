@@ -3,7 +3,8 @@
 import { useTransactions } from "@/hooks/useTransactions";
 import { formatCurrency, formatDate, statusLabel, typeLabel } from "@/lib/formatters";
 import type { Transaction, TransactionType, TransactionStatus } from "@/types/transaction";
-import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
+import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";// nuevo import:
+import { TransactionFiltersBar } from "@/components/ui/transactions/TransactionFiltersBar";
 import {
   Table,
   TableBody,
@@ -40,8 +41,8 @@ function maskAccount(account: string): string {
 }
 
 export default function HomePage() {
-  const { data, loading, error, page, pageSize, update } = useTransactions();
-
+  const { data, loading, error, page, pageSize, filters, update } = useTransactions();
+  
   if (loading) return <p className="p-6">Cargando...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
 
@@ -49,7 +50,11 @@ export default function HomePage() {
     <TooltipProvider>
       <main className="p-4 md:p-6 lg:p-8 w-full">
         <h1 className="text-xl font-semibold mb-4">Historial de transacciones</h1>
-
+        <TransactionFiltersBar
+  filters={filters}
+  onChange={(f) => update({ filters: f, page: 1 })}
+  onClear={() => update({ filters: {}, page: 1 })}
+/>
         <div className="rounded-lg border shadow-sm overflow-hidden">
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             <Table>
