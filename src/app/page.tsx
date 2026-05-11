@@ -43,7 +43,7 @@ function maskAccount(account: string): string {
 export default function HomePage() {
   const { data, loading, error, page, pageSize, filters, update } = useTransactions();
   
-  if (loading) return <p className="p-6">Cargando...</p>;
+  if (loading && !data ) return <p className="p-6">Cargando...</p>;
   if (error) return <p className="p-6 text-red-500">{error}</p>;
 
   return (

@@ -1,8 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import type { TransactionFilters, TransactionType, TransactionStatus, Currency } from "@/types/transaction";
 import { CURRENCY_OPTIONS, TYPE_OPTIONS, STATUS_OPTIONS } from "@/types/transaction";
-
+import { FilterX } from "lucide-react";
 interface Props {
   filters: TransactionFilters;
   onChange: (filters: TransactionFilters) => void;
@@ -10,8 +11,17 @@ interface Props {
 }
 
 export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
+  const timer = useRef<NodeJS.Timeout | null>(null);
+
   const set = (patch: Partial<TransactionFilters>) =>
     onChange({ ...filters, ...patch });
+
+  const onSearch = (value: string) => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(() => {
+      set({ search: value || undefined });
+    }, 300);
+  };
 
   return (
     <div className="flex flex-wrap gap-3 items-end py-4">
@@ -20,8 +30,8 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
         <input
           type="text"
           placeholder="Descripción, ID, cuenta..."
-          value={filters.search ?? ""}
-          onChange={(e) => set({ search: e.target.value || undefined })}
+          defaultValue={filters.search ?? ""}
+          onChange={(e) => onSearch(e.target.value)}
           className="border rounded px-3 py-1.5 text-sm w-56"
         />
       </div>
@@ -69,13 +79,56 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
           ))}
         </select>
       </div>
+      <div className="flex flex-col gap-1">
+  <label className="text-xs text-zinc-500">Desde</label>
+  <input
+    type="date"
+    value={filters.dateFrom ?? ""}
+    onChange={(e) => set({ dateFrom: e.target.value || undefined })}
+    className="border rounded px-3 py-1.5 text-sm"
+  />
+</div>
 
-      <button
-        onClick={onClear}
-        className="text-sm text-zinc-500 hover:text-zinc-700 underline"
-      >
-        Limpiar filtros
-      </button>
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-zinc-500">Hasta</label>
+  <input
+    type="date"
+    value={filters.dateTo ?? ""}
+    onChange={(e) => set({ dateTo: e.target.value || undefined })}
+    className="border rounded px-3 py-1.5 text-sm"
+  />
+</div>
+
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-zinc-500">Monto mín</label>
+  <input
+    type="number"
+    placeholder="0"
+    value={filters.amountMin ?? ""}
+    onChange={(e) => set({ amountMin: e.target.value ? Number(e.target.value) : undefined })}
+    className="border rounded px-3 py-1.5 text-sm w-24"
+  />
+</div>
+
+<div className="flex flex-col gap-1">
+  <label className="text-xs text-zinc-500">Monto máx</label>
+  <input
+    type="number"
+    placeholder="∞"
+    value={filters.amountMax ?? ""}
+    onChange={(e) => set({ amountMax: e.target.value ? Number(e.target.value) : undefined })}
+    className="border rounded px-3 py-1.5 text-sm w-24"
+  />
+</div>
+
+  <button
+    onClick={onClear}
+    className="ml-auto flex items-center gap-1.5 text-sm text-[#FC2B60] bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
+  >
+    <FilterX size={14} />
+    Limpiar filtros
+  </button>
+
     </div>
   );
 }

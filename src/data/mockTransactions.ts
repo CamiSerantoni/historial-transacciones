@@ -53,7 +53,7 @@ function makeOne(): Transaction {
 
   return {
     id: "TX-" + Math.random().toString(36).substring(2, 10).toUpperCase(),
-    date: dateRange("2024-01-01", "2024-12-31"),
+    date: dateRange("2026-01-01", "2026-05-31"),
     type,
     status: weighted(STATUSES),
     currency,
