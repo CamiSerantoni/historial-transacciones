@@ -2,7 +2,7 @@
 
 import { useTransactions } from "@/hooks/useTransactions";
 import { formatCurrency, formatDate, statusLabel, typeLabel } from "@/lib/formatters";
-import type { Transaction, TransactionType } from "@/types/transaction";
+import type { Transaction, TransactionType, TransactionStatus } from "@/types/transaction";
 import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
 import {
   Table,
