@@ -2,9 +2,8 @@
 
 import { Download } from "lucide-react";
 import { fetchAllForExport } from "@/lib/fetchTransactions";
-import type { TransactionFilters } from "@/types/transaction";
-import type { SortField, SortDirection } from "@/types/transaction";
-
+import type { Transaction, TransactionFilters, SortField, SortDirection } from "@/types/transaction";
+import { typeLabel, statusLabel } from "@/lib/formatters";
 interface Props {
   filters: TransactionFilters;
   sortField: SortField;
@@ -29,27 +28,18 @@ function escape(val: string): string {
   return val;
 }
 
-function toRow(tx: {
-  date: string;
-  description: string;
-  type: string;
-  status: string;
-  amount: number;
-  currency: string;
-  accountOrigin: string;
-  accountDestination: string;
-}): string {
-  return [
-    escape(tx.date),
-    escape(tx.description),
-    escape(tx.type),
-    escape(tx.status),
-    String(tx.amount),
-    escape(tx.currency),
-    escape(tx.accountOrigin),
-    escape(tx.accountDestination),
-  ].join(",");
-}
+function toRow(tx: Transaction): string {
+    return [
+      escape(tx.date),
+      escape(tx.description),
+      escape(typeLabel(tx.type)),
+      escape(statusLabel(tx.status)),
+      String(tx.amount),
+      escape(tx.currency),
+      escape(tx.accountOrigin),
+      escape(tx.accountDestination),
+    ].join(",");
+  }
 
 export function TransactionExport({ filters, sortField, sortDirection }: Props) {
   const onExport = async () => {
