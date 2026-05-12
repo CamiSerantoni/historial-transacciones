@@ -59,9 +59,12 @@ export default function HomePage() {
   const { data, loading, error, page, pageSize, filters, update } = useTransactions();
 
   if (loading && !data) return (
-    <main className="p-4 md:p-6 lg:p-8 w-full">
-      <h1 className="text-xl font-semibold mb-4">Historial de transacciones</h1>
-      <div className="rounded-lg border shadow-sm overflow-hidden">
+    <main className="p-4 md:p-6 lg:p-8 w-full bg-zinc-900 min-h-screen">
+      <div className="mb-4">
+        <h1 className="text-xl font-semibold text-white">Historial de transacciones</h1>
+        <p className="text-sm text-zinc-400">Módulo de consulta de movimientos para operadores internos</p>
+      </div>
+      <div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
         <Table>
           <TableHeader>
             <TableHeaderRow />
@@ -75,7 +78,7 @@ export default function HomePage() {
   );
 
   if (error && !data) return (
-    <div className="p-6 text-center">
+    <div className="p-6 text-center bg-zinc-900 min-h-screen">
       <p className="text-red-500 mb-2">{error}</p>
       <button
         onClick={() => update({ page: 1 })}
@@ -90,17 +93,17 @@ export default function HomePage() {
 
   return (
     <TooltipProvider>
-      <main className="p-4 md:p-6 lg:p-8 w-full">
-        <h1 className="text-xl font-semibold mb-4">Historial de transacciones</h1>
-
+      <main className="p-4 md:p-6 lg:p-8 w-full bg-zinc-900 min-h-screen">
+        <h1 className="text-xl font-semibold mb-4 text-white">Historial de transacciones</h1>
+        <p className="text-sm text-white pb-4">Módulo de consulta de movimientos</p>
         <TransactionFiltersBar
           filters={filters}
           onChange={(f) => update({ filters: f, page: 1 })}
           onClear={() => update({ filters: {}, page: 1 })}
         />
 
-        <div className="rounded-lg border shadow-sm overflow-hidden">
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+<div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
             <Table>
               <TableHeader>
                 <TableHeaderRow />

@@ -20,12 +20,12 @@ export function TransactionPagination({
 }: Props) {
   return (
     <div className="flex items-center justify-between py-4">
-      <div className="flex items-center gap-2 text-sm text-zinc-600">
+      <div className="flex items-center gap-2 text-sm text-zinc-300">
         <span>Filas:</span>
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value) as PageSizeOption)}
-          className="border rounded px-2 py-1 text-sm"
+          className="border border-zinc-600 rounded px-2 py-1 text-sm bg-zinc-800 text-white"
         >
           {PAGE_SIZE_OPTIONS.map((size) => (
             <option key={size} value={size}>
@@ -35,7 +35,7 @@ export function TransactionPagination({
         </select>
       </div>
 
-      <div className="flex items-center gap-2 text-sm text-zinc-600">
+      <div className="flex items-center gap-2 text-sm text-zinc-300">
         <span>Página {page} de {totalPages}</span>
         <Button
           variant="outline"

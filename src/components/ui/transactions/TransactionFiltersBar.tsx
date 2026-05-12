@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef } from "react";
+import { FilterX } from "lucide-react";
 import type { TransactionFilters, TransactionType, TransactionStatus, Currency } from "@/types/transaction";
 import { CURRENCY_OPTIONS, TYPE_OPTIONS, STATUS_OPTIONS } from "@/types/transaction";
-import { FilterX } from "lucide-react";
+
 interface Props {
   filters: TransactionFilters;
   onChange: (filters: TransactionFilters) => void;
@@ -23,25 +24,26 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
     }, 300);
   };
 
+
   return (
     <div className="flex flex-wrap gap-3 items-end py-4">
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-zinc-500">Buscar</label>
+        <label className="text-xs text-zinc-400">Buscar</label>
         <input
           type="text"
           placeholder="Descripción, ID, cuenta..."
           defaultValue={filters.search ?? ""}
           onChange={(e) => onSearch(e.target.value)}
-          className="border rounded px-3 py-1.5 text-sm w-56"
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm w-56 bg-zinc-800 text-white placeholder:text-zinc-500"
         />
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-zinc-500">Tipo</label>
+        <label className="text-xs text-zinc-400">Tipo</label>
         <select
           value={filters.type ?? ""}
           onChange={(e) => set({ type: (e.target.value as TransactionType) || undefined })}
-          className="border rounded px-3 py-1.5 text-sm"
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todos</option>
           {TYPE_OPTIONS.map((t) => (
@@ -51,11 +53,11 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-zinc-500">Estado</label>
+        <label className="text-xs text-zinc-400">Estado</label>
         <select
           value={filters.status ?? ""}
           onChange={(e) => set({ status: (e.target.value as TransactionStatus) || undefined })}
-          className="border rounded px-3 py-1.5 text-sm"
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todos</option>
           {STATUS_OPTIONS.map((s) => (
@@ -67,11 +69,11 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
       </div>
 
       <div className="flex flex-col gap-1">
-        <label className="text-xs text-zinc-500">Moneda</label>
+        <label className="text-xs text-zinc-400">Moneda</label>
         <select
           value={filters.currency ?? ""}
           onChange={(e) => set({ currency: (e.target.value as Currency) || undefined })}
-          className="border rounded px-3 py-1.5 text-sm"
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todas</option>
           {CURRENCY_OPTIONS.map((c) => (
@@ -79,56 +81,58 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
           ))}
         </select>
       </div>
+
       <div className="flex flex-col gap-1">
-  <label className="text-xs text-zinc-500">Desde</label>
-  <input
-    type="date"
-    value={filters.dateFrom ?? ""}
-    onChange={(e) => set({ dateFrom: e.target.value || undefined })}
-    className="border rounded px-3 py-1.5 text-sm"
-  />
-</div>
+        <label className="text-xs text-zinc-400">Desde</label>
+        <input
+          type="date"
+          value={filters.dateFrom ?? ""}
+          onChange={(e) => set({ dateFrom: e.target.value || undefined })}
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
+        />
+      </div>
 
-<div className="flex flex-col gap-1">
-  <label className="text-xs text-zinc-500">Hasta</label>
-  <input
-    type="date"
-    value={filters.dateTo ?? ""}
-    onChange={(e) => set({ dateTo: e.target.value || undefined })}
-    className="border rounded px-3 py-1.5 text-sm"
-  />
-</div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-zinc-400">Hasta</label>
+        <input
+          type="date"
+          value={filters.dateTo ?? ""}
+          onChange={(e) => set({ dateTo: e.target.value || undefined })}
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
+        />
+      </div>
 
-<div className="flex flex-col gap-1">
-  <label className="text-xs text-zinc-500">Monto mín</label>
-  <input
-    type="number"
-    placeholder="0"
-    value={filters.amountMin ?? ""}
-    onChange={(e) => set({ amountMin: e.target.value ? Number(e.target.value) : undefined })}
-    className="border rounded px-3 py-1.5 text-sm w-24"
-  />
-</div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-zinc-400">Monto mín</label>
+        <input
+          type="number"
+          placeholder="0"
+          value={filters.amountMin ?? ""}
+          onChange={(e) => set({ amountMin: e.target.value ? Number(e.target.value) : undefined })}
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm w-24 bg-zinc-800 text-white placeholder:text-zinc-500"
+        />
+      </div>
 
-<div className="flex flex-col gap-1">
-  <label className="text-xs text-zinc-500">Monto máx</label>
-  <input
-    type="number"
-    placeholder="∞"
-    value={filters.amountMax ?? ""}
-    onChange={(e) => set({ amountMax: e.target.value ? Number(e.target.value) : undefined })}
-    className="border rounded px-3 py-1.5 text-sm w-24"
-  />
-</div>
+      <div className="flex flex-col gap-1">
+        <label className="text-xs text-zinc-400">Monto máx</label>
+        <input
+          type="number"
+          placeholder="∞"
+          value={filters.amountMax ?? ""}
+          onChange={(e) => set({ amountMax: e.target.value ? Number(e.target.value) : undefined })}
+          className="border border-zinc-600 rounded px-3 py-1.5 text-sm w-24 bg-zinc-800 text-white placeholder:text-zinc-500"
+        />
+      </div>
 
-  <button
-    onClick={onClear}
-    className="ml-auto flex items-center gap-1.5 text-sm text-[#FC2B60] bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md transition-colors"
-  >
-    <FilterX size={14} />
-    Limpiar filtros
-  </button>
-
+    
+        <button
+          onClick={onClear}
+          className="ml-auto flex items-center gap-1.5 text-sm text-[#FC2B60] bg-red-900/30 hover:bg-red-900/50 px-3 py-1.5 rounded-md transition-colors"
+        >
+          <FilterX size={14} />
+          Limpiar filtros
+        </button>
+   
     </div>
   );
 }

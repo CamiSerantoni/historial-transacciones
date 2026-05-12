@@ -7,9 +7,9 @@ interface Props {
 
 export function TransactionEmpty({ hasFilters, onClear }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
-      <Inbox size={48} className="mb-3" />
-      <p className="text-lg font-medium mb-1">No hay transacciones</p>
+    <div className="flex flex-col items-center justify-center py-16 text-zinc-500">
+      <Inbox size={48} className="mb-3 text-zinc-600" />
+      <p className="text-lg font-medium mb-1 text-zinc-300">No hay transacciones</p>
       {hasFilters ? (
         <p className="text-sm mb-3">
           No se encontraron resultados con los filtros actuales.
