@@ -50,8 +50,8 @@ function applyPage(items: Transaction[], params: FetchParams): Transaction[] {
 }
 
 export async function fetchTransactions(params: FetchParams): Promise<FetchResult> {
-  await new Promise((r) => setTimeout(r, 3000));
-  if (Math.random() < 0) {
+  await new Promise((r) => setTimeout(r, 600));
+  if (Math.random() < 0.1) {
     throw new Error("Error de conexión. Intenta nuevamente.");
   }
 
@@ -69,7 +69,7 @@ export async function fetchTransactions(params: FetchParams): Promise<FetchResul
 }
 
 export async function fetchAllForExport(params: FetchParams): Promise<Transaction[]> {
-  await new Promise((r) => setTimeout(r, 3000));
+  await new Promise((r) => setTimeout(r, 300));
   const filtered = applyFilters(mockTransactions, params);
   return applySort(filtered, params);
 }
