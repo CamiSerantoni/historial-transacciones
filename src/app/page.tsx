@@ -1,6 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import { useTransactions } from "@/hooks/useTransactions";
+import { useURLSync } from "@/hooks/useURLSync";
 import { formatCurrency, formatDate, statusLabel, typeLabel } from "@/lib/formatters";
 import type { Transaction, TransactionType, TransactionStatus } from "@/types/transaction";
 import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
@@ -55,8 +57,12 @@ function TableHeaderRow() {
   );
 }
 
-export default function HomePage() {
+function Dashboard() {
   const { data, loading, error, page, pageSize, filters, update } = useTransactions();
+
+  useURLSync(filters, page, pageSize, (f, p, ps) =>
+    update({ filters: f, page: p, pageSize: ps as 10 | 25 | 50 })
+  );
 
   if (loading && !data) return (
     <main className="p-4 md:p-6 lg:p-8 w-full bg-zinc-900 min-h-screen">
@@ -94,15 +100,18 @@ export default function HomePage() {
   return (
     <TooltipProvider>
       <main className="p-4 md:p-6 lg:p-8 w-full bg-zinc-900 min-h-screen">
-        <h1 className="text-xl font-semibold mb-4 text-white">Historial de transacciones</h1>
-        <p className="text-sm text-white pb-4">Módulo de consulta de movimientos</p>
+        <div className="mb-4">
+          <h1 className="text-xl font-semibold text-white">Historial de transacciones</h1>
+          <p className="text-sm text-zinc-400">Módulo de consulta de movimientos para operadores internos</p>
+        </div>
+
         <TransactionFiltersBar
           filters={filters}
           onChange={(f) => update({ filters: f, page: 1 })}
           onClear={() => update({ filters: {}, page: 1 })}
         />
 
-<div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
+        <div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
             <Table>
               <TableHeader>
@@ -176,5 +185,13 @@ export default function HomePage() {
         )}
       </main>
     </TooltipProvider>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense>
+      <Dashboard />
+    </Suspense>
   );
 }
