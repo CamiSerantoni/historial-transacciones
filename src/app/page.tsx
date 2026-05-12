@@ -6,6 +6,7 @@ import type { Transaction, TransactionType, TransactionStatus } from "@/types/tr
 import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
 import { TransactionFiltersBar } from "@/components/ui/transactions/TransactionFiltersBar";
 import { TransactionEmpty } from "@/components/ui/transactions/TransactionEmpty";
+import { TransactionTableSkeleton } from "@/components/ui/transactions/TransactionTableSkeleton";
 import {
   Table,
   TableBody,
@@ -41,10 +42,38 @@ function maskAccount(account: string): string {
   return `●●●●-●●●●-${parts[2].slice(-4)}`;
 }
 
+function TableHeaderRow() {
+  return (
+    <TableRow className="bg-[#FC2B60] hover:bg-[#FC2B60] sticky top-0 z-10">
+      <TableHead className="text-white font-semibold">Fecha</TableHead>
+      <TableHead className="text-white font-semibold">Descripción</TableHead>
+      <TableHead className="text-white font-semibold">Tipo</TableHead>
+      <TableHead className="text-white font-semibold">Estado</TableHead>
+      <TableHead className="text-white font-semibold text-right">Monto</TableHead>
+      <TableHead className="text-white font-semibold">Cuenta origen</TableHead>
+    </TableRow>
+  );
+}
+
 export default function HomePage() {
   const { data, loading, error, page, pageSize, filters, update } = useTransactions();
 
-  if (loading && !data) return <p className="p-6">Cargando...</p>;
+  if (loading && !data) return (
+    <main className="p-4 md:p-6 lg:p-8 w-full">
+      <h1 className="text-xl font-semibold mb-4">Historial de transacciones</h1>
+      <div className="rounded-lg border shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableHeaderRow />
+          </TableHeader>
+          <TableBody>
+            <TransactionTableSkeleton />
+          </TableBody>
+        </Table>
+      </div>
+    </main>
+  );
+
   if (error && !data) return (
     <div className="p-6 text-center">
       <p className="text-red-500 mb-2">{error}</p>
@@ -74,14 +103,7 @@ export default function HomePage() {
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-[#FC2B60] hover:bg-[#FC2B60] sticky top-0 z-10">
-                  <TableHead className="text-white font-semibold">Fecha</TableHead>
-                  <TableHead className="text-white font-semibold">Descripción</TableHead>
-                  <TableHead className="text-white font-semibold">Tipo</TableHead>
-                  <TableHead className="text-white font-semibold">Estado</TableHead>
-                  <TableHead className="text-white font-semibold text-right">Monto</TableHead>
-                  <TableHead className="text-white font-semibold">Cuenta origen</TableHead>
-                </TableRow>
+                <TableHeaderRow />
               </TableHeader>
               <TableBody>
                 {(data?.items ?? []).length === 0 ? (
