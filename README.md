@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# 💳 Historial de Transacciones
 
-First, run the development server:
+**Módulo de consulta de movimientos para operadores bancarios**
+
+![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-18181B?style=flat-square&logo=shadcnui&logoColor=white)
+
+ [Instrucciones del desafío](./instructions.md)
+
+</div>
+
+---
+
+## Descripción
+
+Interfaz de consulta de transacciones para operadores internos de un banco digital. Permite buscar movimientos por múltiples criterios, navegar resultados paginados y exportar los datos filtrados a CSV.
+
+Simula comunicación con un servidor mediante un delay de 600ms y errores aleatorios (10%) para representar condiciones reales de red.
+
+---
+
+## Inicio rápido
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000) en el navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Funcionalidades
 
-## Learn More
+### 📋 Tabla de transacciones
 
-To learn more about Next.js, take a look at the following resources:
+Vista principal con todas las transacciones. Cada fila muestra fecha, descripción, tipo, estado, monto formateado y cuenta origen enmascarada.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Montos formateados con `Intl.NumberFormat` según la moneda
+- Créditos con dato en color verde, débitos en rojo
+- Transacciones fallidas con fila visiblemente diferente
+- Tooltip al hover sobre la cuenta origen muestra origen y destino completos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 🔍 Filtros
 
-## Deploy on Vercel
+Barra de filtros con búsqueda por descripción (debounce 300ms), rango de fechas, tipo, estado, moneda y rango de monto. Botón para limpiar todos los filtros. Los filtros se sincronizan con la URL como query params.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 📄 Paginación
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Paginación simulada server-side con selector de filas por página (10, 25, 50). La preferencia de pageSize se persiste en `localStorage`.
+
+### 📥 Exportar CSV
+
+Descarga `movimientos-{fecha}.csv` con los registros filtrados. Headers en español, montos como números planos y moneda en columna separada. BOM incluido para compatibilidad con Excel.
+
+### 🎨 Estados de UI
+
+| Estado | Implementación |
+|---|---|
+| Primera carga | Skeleton loader que replica la estructura de la tabla |
+| Carga posterior | Datos anteriores visibles mientras carga la nueva página |
+| Error | Mensaje con botón para reintentar |
+| Sin resultados | Mensaje contextual con opción de limpiar filtros |
+
+---
+
+
+## Stack
+
+- **Next.js 14** — App Router
+- **TypeScript** — tipado estricto sin `any`
+- **Tailwind CSS** — estilos
+- **shadcn/ui** — componentes base (New York, Zinc)
