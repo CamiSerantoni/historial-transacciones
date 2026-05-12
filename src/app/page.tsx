@@ -170,7 +170,8 @@ function Dashboard() {
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>{tx.accountOrigin}</p>
+                              <p> Origen:{tx.accountOrigin}</p> 
+                              <p> Destino: {tx.accountDestination}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>

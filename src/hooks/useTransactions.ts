@@ -22,13 +22,7 @@ type Action =
   | { t: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">> }
   | { t: "reset" };
 
-const PAGE_KEY = "tx_page_size";
-
-function readPageSize(): PageSizeOption {
-  if (typeof window === "undefined") return 10;
-  const v = localStorage.getItem(PAGE_KEY);
-  return v === "25" ? 25 : v === "50" ? 50 : 10;
-}
+const PAGE_KEY = "page_size";
 
 function initialState(): State {
   return {
@@ -36,7 +30,7 @@ function initialState(): State {
     loading: false,
     error: null,
     page: 1,
-    pageSize: readPageSize(),
+    pageSize: 10,
     filters: {},
     sortField: "date",
     sortDirection: "desc",
@@ -63,6 +57,21 @@ function reducer(state: State, action: Action): State {
 export function useTransactions() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
 
+
+
+  // Lee localStorage después de montar - paginación
+  useEffect(() => {
+    try {
+      const v = localStorage.getItem(PAGE_KEY);
+      if (v === "25" || v === "50") {
+        dispatch({ t: "update", payload: { pageSize: Number(v) as PageSizeOption } });
+      }
+    } catch {
+    }
+  }, []);
+
+
+
   useEffect(() => {
     let cancel = false;
 
@@ -84,6 +93,7 @@ export function useTransactions() {
 
     return () => { cancel = true; };
   }, [state.page, state.pageSize, state.filters, state.sortField, state.sortDirection]);
+
 
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
