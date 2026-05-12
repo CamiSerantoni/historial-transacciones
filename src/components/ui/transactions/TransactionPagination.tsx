@@ -42,6 +42,7 @@ export function TransactionPagination({
           size="sm"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
+          className="border-zinc-600 rounded-lg"
         >
           Anterior
         </Button>
@@ -50,6 +51,7 @@ export function TransactionPagination({
           size="sm"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
+          className="border-zinc-600 rounded-lg"
         >
           Siguiente
         </Button>

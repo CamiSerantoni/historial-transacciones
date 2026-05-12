@@ -9,6 +9,7 @@ import { TransactionPagination } from "@/components/ui/transactions/TransactionP
 import { TransactionFiltersBar } from "@/components/ui/transactions/TransactionFiltersBar";
 import { TransactionEmpty } from "@/components/ui/transactions/TransactionEmpty";
 import { TransactionTableSkeleton } from "@/components/ui/transactions/TransactionTableSkeleton";
+import { TransactionExport } from "@/components/ui/transactions/TransactionExportCsv";
 import {
   Table,
   TableBody,
@@ -58,7 +59,7 @@ function TableHeaderRow() {
 }
 
 function Dashboard() {
-  const { data, loading, error, page, pageSize, filters, update } = useTransactions();
+  const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update } = useTransactions();
 
   useURLSync(filters, page, pageSize, (f, p, ps) =>
     update({ filters: f, page: p, pageSize: ps as 10 | 25 | 50 })
@@ -110,6 +111,14 @@ function Dashboard() {
           onChange={(f) => update({ filters: f, page: 1 })}
           onClear={() => update({ filters: {}, page: 1 })}
         />
+
+        <div className="flex justify-end mb-2">
+          <TransactionExport
+            filters={filters}
+            sortField={sortField}
+            sortDirection={sortDirection}
+          />
+</div>
 
         <div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">

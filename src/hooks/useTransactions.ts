@@ -2,33 +2,29 @@
 
 import { useReducer, useEffect, useCallback } from "react";
 import { fetchTransactions } from "@/lib/fetchTransactions";
-import type { Filters, FetchResult } from "@/types/transaction";
-
-export type PageSize = 10 | 25 | 50;
-export type SortField = "date" | "amount";
-export type SortDir = "asc" | "desc" | null;
+import type { TransactionFilters, FetchResult, PageSizeOption, SortField, SortDirection } from "@/types/transaction";
 
 interface State {
   data: FetchResult | null;
   loading: boolean;
   error: string | null;
   page: number;
-  pageSize: PageSize;
-  filters: Filters;
+  pageSize: PageSizeOption;
+  filters: TransactionFilters;
   sortField: SortField;
-  sortDir: SortDir;
+  sortDirection: SortDirection;
 }
 
 type Action =
   | { t: "fetch_start" }
   | { t: "fetch_ok"; payload: FetchResult }
   | { t: "fetch_fail"; payload: string }
-  | { t: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDir">> }
+  | { t: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">> }
   | { t: "reset" };
 
 const PAGE_KEY = "tx_page_size";
 
-function readPageSize(): PageSize {
+function readPageSize(): PageSizeOption {
   if (typeof window === "undefined") return 10;
   const v = localStorage.getItem(PAGE_KEY);
   return v === "25" ? 25 : v === "50" ? 50 : 10;
@@ -43,7 +39,7 @@ function initialState(): State {
     pageSize: readPageSize(),
     filters: {},
     sortField: "date",
-    sortDir: "desc",
+    sortDirection: "desc",
   };
 }
 
@@ -67,7 +63,6 @@ function reducer(state: State, action: Action): State {
 export function useTransactions() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
 
-  // fetch automático cuando cambian filtros/página/sort
   useEffect(() => {
     let cancel = false;
 
@@ -78,7 +73,7 @@ export function useTransactions() {
       pageSize: state.pageSize,
       filters: state.filters,
       sortField: state.sortField,
-      sortDir: state.sortDir,
+      sortDirection: state.sortDirection,
     })
       .then((res) => {
         if (!cancel) dispatch({ t: "fetch_ok", payload: res });
@@ -88,16 +83,14 @@ export function useTransactions() {
       });
 
     return () => { cancel = true; };
-  }, [state.page, state.pageSize, state.filters, state.sortField, state.sortDir]);
+  }, [state.page, state.pageSize, state.filters, state.sortField, state.sortDirection]);
 
-  // persistir pageSize
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
   }, [state.pageSize]);
 
-  // wrapper para no exponer dispatch
   const update = useCallback(
-    (patch: Parameters<typeof dispatch>[0] extends { t: "update"; payload: infer P } ? P : never) =>
+    (patch: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">>) =>
       dispatch({ t: "update", payload: patch }),
     []
   );
@@ -106,12 +99,12 @@ export function useTransactions() {
 
   const toggleSort = useCallback(
     (field: SortField) => {
-      const next: SortDir =
+      const next: SortDirection | null =
         state.sortField !== field
           ? "asc"
-          : state.sortDir === "asc"
+          : state.sortDirection === "asc"
           ? "desc"
-          : state.sortDir === "desc"
+          : state.sortDirection === "desc"
           ? null
           : "asc";
 
@@ -119,12 +112,12 @@ export function useTransactions() {
         t: "update",
         payload: {
           sortField: next ? field : "date",
-          sortDir: next,
+          sortDirection: next ?? "desc",
           page: 1,
         },
       });
     },
-    [state.sortField, state.sortDir]
+    [state.sortField, state.sortDirection]
   );
 
   return {
