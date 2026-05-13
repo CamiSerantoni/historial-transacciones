@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { useTransactions } from "@/hooks/useTransactions";
 import { useURLSync } from "@/hooks/useURLSync";
 import { formatCurrency, formatDate, statusLabel, typeLabel } from "@/lib/formatters";
-import type { Transaction, TransactionType, TransactionStatus } from "@/types/transaction";
+import type { Transaction, TransactionType, TransactionStatus, SortField, SortDirection } from "@/types/transaction";
 import { TransactionPagination } from "@/components/ui/transactions/TransactionPagination";
 import { TransactionFiltersBar } from "@/components/ui/transactions/TransactionFiltersBar";
 import { TransactionEmpty } from "@/components/ui/transactions/TransactionEmpty";
@@ -24,6 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
 const amountColor: Record<TransactionType, string> = {
   credit: "text-emerald-600",
@@ -45,21 +46,38 @@ function maskAccount(account: string): string {
   return `●●●●-●●●●-${parts[2].slice(-4)}`;
 }
 
-function TableHeaderRow() {
+function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortField: SortField; sortDirection: SortDirection }) {
+  if (sortField !== field) return <ArrowUpDown className="inline ml-1 h-3 w-3 opacity-40" />;
+  return sortDirection === "asc"
+    ? <ArrowUp className="inline ml-1 h-3 w-3" />
+    : <ArrowDown className="inline ml-1 h-3 w-3" />;
+}
+
+function TableHeaderRow({ sortField, sortDirection, onSort }: { sortField: SortField; sortDirection: SortDirection; onSort: (field: SortField) => void }) {
   return (
     <TableRow className="bg-[#FC2B60] hover:bg-[#FC2B60] sticky top-0 z-10">
-      <TableHead className="text-white font-semibold">Fecha</TableHead>
+      <TableHead className="text-white font-semibold">
+        <button onClick={() => onSort("date")} className="flex items-center gap-1 hover:opacity-80">
+          Fecha
+          <SortIcon field="date" sortField={sortField} sortDirection={sortDirection} />
+        </button>
+      </TableHead>
       <TableHead className="text-white font-semibold">Descripción</TableHead>
       <TableHead className="text-white font-semibold">Tipo</TableHead>
       <TableHead className="text-white font-semibold">Estado</TableHead>
-      <TableHead className="text-white font-semibold text-right">Monto</TableHead>
+      <TableHead className="text-white font-semibold text-right">
+        <button onClick={() => onSort("amount")} className="flex items-center gap-1 ml-auto hover:opacity-80">
+          Monto
+          <SortIcon field="amount" sortField={sortField} sortDirection={sortDirection} />
+        </button>
+      </TableHead>
       <TableHead className="text-white font-semibold">Cuenta origen</TableHead>
     </TableRow>
   );
 }
 
 function Dashboard() {
-  const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update, retry } = useTransactions();
+  const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update, retry, toggleSort } = useTransactions();
 
   useURLSync(filters, page, pageSize, (f, p, ps) =>
     update({ filters: f, page: p, pageSize: ps as 10 | 25 | 50 })
@@ -74,7 +92,7 @@ function Dashboard() {
       <div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
         <Table>
           <TableHeader>
-            <TableHeaderRow />
+            <TableHeaderRow sortField={sortField} sortDirection={sortDirection} onSort={toggleSort} />
           </TableHeader>
           <TableBody>
             <TransactionTableSkeleton />
@@ -87,10 +105,7 @@ function Dashboard() {
   if (error && !data) return (
     <div className="p-6 text-center bg-zinc-900 min-h-screen flex flex-col items-center justify-center">
       <p className="text-red-400 mb-4">{error}</p>
-      <button
-        onClick={retry}
-        className="text-sm text-[#FC2B60] underline hover:no-underline"
-      >
+      <button onClick={retry} className="text-sm text-[#FC2B60] underline hover:no-underline">
         Reintentar
       </button>
     </div>
@@ -133,7 +148,7 @@ function Dashboard() {
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
             <Table>
               <TableHeader>
-                <TableHeaderRow />
+                <TableHeaderRow sortField={sortField} sortDirection={sortDirection} onSort={toggleSort} />
               </TableHeader>
               <TableBody>
                 {(data?.items ?? []).length === 0 ? (
