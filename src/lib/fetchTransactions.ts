@@ -52,7 +52,7 @@ function applyPage(items: Transaction[], params: FetchParams): Transaction[] {
 export async function fetchTransactions(params: FetchParams): Promise<FetchResult> {
   await new Promise((r) => setTimeout(r, 600));
   if (Math.random() < 0.1) {
-    throw new Error("Error de conexión. Intenta nuevamente.");
+    throw new Error("Presentamos un error para conectarnos con los datos, Inténtalo nuevamente.");
   }
 
   const filtered = applyFilters(mockTransactions, params);

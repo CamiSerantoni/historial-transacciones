@@ -54,7 +54,8 @@ Barra de filtros con búsqueda por descripción (debounce 300ms), rango de fecha
 
 ### 📄 Paginación
 
-Paginación simulada server-side con selector de filas por página (10, 25, 50). La preferencia de pageSize se persiste en `localStorage`.
+Paginación simulada server-side con selector de filas por página (10, 25, 50). 
+La preferencia de pageSize se persiste en `localStorage`.
 
 ### 📥 Exportar CSV
 
@@ -75,6 +76,6 @@ Descarga `movimientos-{fecha}.csv` con los registros filtrados. Headers en espa�
 ## Stack
 
 - **Next.js 14** — App Router
-- **TypeScript** — tipado estricto sin `any`
+- **TypeScript** — tipado 
 - **Tailwind CSS** — estilos
-- **shadcn/ui** — componentes base (New York, Zinc)
+- **shadcn/ui** — componentes base

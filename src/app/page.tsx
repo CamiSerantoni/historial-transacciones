@@ -59,7 +59,7 @@ function TableHeaderRow() {
 }
 
 function Dashboard() {
-  const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update } = useTransactions();
+  const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update, retry } = useTransactions();
 
   useURLSync(filters, page, pageSize, (f, p, ps) =>
     update({ filters: f, page: p, pageSize: ps as 10 | 25 | 50 })
@@ -85,11 +85,11 @@ function Dashboard() {
   );
 
   if (error && !data) return (
-    <div className="p-6 text-center bg-zinc-900 min-h-screen">
-      <p className="text-red-500 mb-2">{error}</p>
+    <div className="p-6 text-center bg-zinc-900 min-h-screen flex flex-col items-center justify-center">
+      <p className="text-red-400 mb-4">{error}</p>
       <button
-        onClick={() => update({ page: 1 })}
-        className="text-sm text-[#FC2B60] underline"
+        onClick={retry}
+        className="text-sm text-[#FC2B60] underline hover:no-underline"
       >
         Reintentar
       </button>
@@ -118,7 +118,16 @@ function Dashboard() {
             sortField={sortField}
             sortDirection={sortDirection}
           />
-</div>
+        </div>
+
+        {error && (
+          <div className="mb-2 p-3 rounded-lg bg-red-900/30 text-red-400 text-sm flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={retry} className="underline hover:no-underline">
+              Reintentar
+            </button>
+          </div>
+        )}
 
         <div className="rounded-lg border border-zinc-700 shadow-sm overflow-hidden bg-white">
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto overflow-x-hidden">
@@ -170,8 +179,8 @@ function Dashboard() {
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p> Origen:{tx.accountOrigin}</p> 
-                              <p> Destino: {tx.accountDestination}</p>
+                              <p>Origen: {tx.accountOrigin}</p>
+                              <p>Destino: {tx.accountDestination}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>

@@ -13,6 +13,7 @@ interface State {
   filters: TransactionFilters;
   sortField: SortField;
   sortDirection: SortDirection;
+  fetchId: number;
 }
 
 type Action =
@@ -20,20 +21,22 @@ type Action =
   | { t: "fetch_ok"; payload: FetchResult }
   | { t: "fetch_fail"; payload: string }
   | { t: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">> }
-  | { t: "reset" };
+  | { t: "reset" }
+  | { t: "retry" };
 
 const PAGE_KEY = "page_size";
 
 function initialState(): State {
   return {
     data: null,
-    loading: false,
+    loading: true,
     error: null,
     page: 1,
     pageSize: 10,
     filters: {},
     sortField: "date",
     sortDirection: "desc",
+    fetchId: 0,
   };
 }
 
@@ -49,6 +52,8 @@ function reducer(state: State, action: Action): State {
       return { ...state, ...action.payload };
     case "reset":
       return initialState();
+    case "retry":
+      return { ...state, fetchId: state.fetchId + 1, error: null, loading: true };
     default:
       return state;
   }
@@ -56,8 +61,6 @@ function reducer(state: State, action: Action): State {
 
 export function useTransactions() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
-
-
 
   // Lee localStorage después de montar - paginación
   useEffect(() => {
@@ -69,8 +72,6 @@ export function useTransactions() {
     } catch {
     }
   }, []);
-
-
 
   useEffect(() => {
     let cancel = false;
@@ -92,8 +93,7 @@ export function useTransactions() {
       });
 
     return () => { cancel = true; };
-  }, [state.page, state.pageSize, state.filters, state.sortField, state.sortDirection]);
-
+  }, [state.page, state.pageSize, state.filters, state.sortField, state.sortDirection, state.fetchId]);
 
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
@@ -106,6 +106,8 @@ export function useTransactions() {
   );
 
   const reset = useCallback(() => dispatch({ t: "reset" }), []);
+
+  const retry = useCallback(() => dispatch({ t: "retry" }), []);
 
   const toggleSort = useCallback(
     (field: SortField) => {
@@ -134,6 +136,7 @@ export function useTransactions() {
     ...state,
     update,
     reset,
+    retry,
     toggleSort,
   };
 }
