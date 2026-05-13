@@ -5,6 +5,17 @@ import { FilterX } from "lucide-react";
 import type { TransactionFilters, TransactionType, TransactionStatus, Currency } from "@/types/transaction";
 import { CURRENCY_OPTIONS, TYPE_OPTIONS, STATUS_OPTIONS } from "@/types/transaction";
 
+const statusLabels: Record<TransactionStatus, string> = {
+  completed: "Completada",
+  pending: "Pendiente",
+  failed: "Fallida",
+};
+
+const typeLabels: Record<TransactionType, string> = {
+  credit: "Crédito",
+  debit: "Débito",
+};
+
 interface Props {
   filters: TransactionFilters;
   onChange: (filters: TransactionFilters) => void;
@@ -23,7 +34,6 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
       set({ search: value || undefined });
     }, 300);
   };
-
 
   return (
     <div className="flex flex-wrap gap-3 items-end py-4">
@@ -46,8 +56,8 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
           className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todos</option>
-          {TYPE_OPTIONS.map((t) => (
-            <option key={t} value={t}>{t === "credit" ? "Crédito" : "Débito"}</option>
+          {TYPE_OPTIONS.map((type) => (
+            <option key={type} value={type}>{typeLabels[type]}</option>
           ))}
         </select>
       </div>
@@ -60,10 +70,8 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
           className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todos</option>
-          {STATUS_OPTIONS.map((s) => (
-            <option key={s} value={s}>
-              {s === "completed" ? "Completada" : s === "pending" ? "Pendiente" : "Fallida"}
-            </option>
+          {STATUS_OPTIONS.map((status) => (
+            <option key={status} value={status}>{statusLabels[status]}</option>
           ))}
         </select>
       </div>
@@ -76,8 +84,8 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
           className="border border-zinc-600 rounded px-3 py-1.5 text-sm bg-zinc-800 text-white"
         >
           <option value="">Todas</option>
-          {CURRENCY_OPTIONS.map((c) => (
-            <option key={c} value={c}>{c}</option>
+          {CURRENCY_OPTIONS.map((currency) => (
+            <option key={currency} value={currency}>{currency}</option>
           ))}
         </select>
       </div>
@@ -124,15 +132,13 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
         />
       </div>
 
-    
-        <button
-          onClick={onClear}
-          className="ml-auto flex items-center gap-1.5 text-sm text-[#FC2B60] bg-red-900/30 hover:bg-red-900/50 px-3 py-1.5 rounded-md transition-colors"
-        >
-          <FilterX size={14} />
-          Limpiar filtros
-        </button>
-   
+      <button
+        onClick={onClear}
+        className="ml-auto flex items-center gap-1.5 text-sm text-[#FC2B60] bg-red-900/30 hover:bg-red-900/50 px-3 py-1.5 rounded-md transition-colors"
+      >
+        <FilterX size={14} />
+        Limpiar filtros
+      </button>
     </div>
   );
 }

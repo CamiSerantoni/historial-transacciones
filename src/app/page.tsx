@@ -151,7 +151,7 @@ function Dashboard() {
                 <TableHeaderRow sortField={sortField} sortDirection={sortDirection} onSort={toggleSort} />
               </TableHeader>
               <TableBody>
-                {(data?.items ?? []).length === 0 ? (
+                {(data?.data ?? []).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="border-0">
                       <TransactionEmpty
@@ -161,7 +161,7 @@ function Dashboard() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (data?.items ?? []).map((tx: Transaction, i: number) => {
+                  (data?.data ?? []).map((tx: Transaction, i: number) => {
                     const isFailed = tx.status === "failed";
                     return (
                       <TableRow

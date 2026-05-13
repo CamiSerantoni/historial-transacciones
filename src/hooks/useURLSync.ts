@@ -12,43 +12,43 @@ export function useURLSync(
   filters: TransactionFilters,
   page: number,
   pageSize: number,
-  onRead: (f: TransactionFilters, page: number, ps: number) => void
+  onRead: (filters: TransactionFilters, page: number, pageSize: number) => void
 ) {
-  const sp = useSearchParams();
+  const searchParams = useSearchParams();
   const router = useRouter();
-  const path = usePathname();
+  const pathname = usePathname();
 
   useEffect(() => {
-    const f: TransactionFilters = {};
+    const urlFilters: TransactionFilters = {};
 
-    const search = sp.get("search");
-    if (search) f.search = search;
+    const search = searchParams.get("search");
+    if (search) urlFilters.search = search;
 
-    const type = sp.get("type");
-    if (type && validTypes.includes(type as TransactionType)) f.type = type as TransactionType;
+    const type = searchParams.get("type");
+    if (type && validTypes.includes(type as TransactionType)) urlFilters.type = type as TransactionType;
 
-    const status = sp.get("status");
-    if (status && validStatuses.includes(status as TransactionStatus)) f.status = status as TransactionStatus;
+    const status = searchParams.get("status");
+    if (status && validStatuses.includes(status as TransactionStatus)) urlFilters.status = status as TransactionStatus;
 
-    const currency = sp.get("currency");
-    if (currency && validCurrencies.includes(currency as Currency)) f.currency = currency as Currency;
+    const currency = searchParams.get("currency");
+    if (currency && validCurrencies.includes(currency as Currency)) urlFilters.currency = currency as Currency;
 
-    const dateFrom = sp.get("dateFrom");
-    if (dateFrom) f.dateFrom = dateFrom;
+    const dateFrom = searchParams.get("dateFrom");
+    if (dateFrom) urlFilters.dateFrom = dateFrom;
 
-    const dateTo = sp.get("dateTo");
-    if (dateTo) f.dateTo = dateTo;
+    const dateTo = searchParams.get("dateTo");
+    if (dateTo) urlFilters.dateTo = dateTo;
 
-    const amountMin = sp.get("amountMin");
-    if (amountMin) f.amountMin = Number(amountMin);
+    const amountMin = searchParams.get("amountMin");
+    if (amountMin) urlFilters.amountMin = Number(amountMin);
 
-    const amountMax = sp.get("amountMax");
-    if (amountMax) f.amountMax = Number(amountMax);
+    const amountMax = searchParams.get("amountMax");
+    if (amountMax) urlFilters.amountMax = Number(amountMax);
 
-    const p = sp.get("page");
-    const ps = sp.get("pageSize");
+    const urlPage = searchParams.get("page");
+    const urlPageSize = searchParams.get("pageSize");
 
-    onRead(f, p ? Number(p) : 1, ps ? Number(ps) : 10);
+    onRead(urlFilters, urlPage ? Number(urlPage) : 1, urlPageSize ? Number(urlPageSize) : 10);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -66,7 +66,7 @@ export function useURLSync(
     if (page > 1) params.set("page", String(page));
     if (pageSize !== 10) params.set("pageSize", String(pageSize));
 
-    const qs = params.toString();
-    router.replace(qs ? `${path}?${qs}` : path, { scroll: false });
-  }, [filters, page, pageSize, path, router]);
+    const queryString = params.toString();
+    router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false });
+  }, [filters, page, pageSize, pathname, router]);
 }

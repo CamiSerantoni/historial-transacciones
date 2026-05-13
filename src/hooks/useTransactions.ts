@@ -5,7 +5,7 @@ import { fetchTransactions } from "@/lib/fetchTransactions";
 import type { Transaction, TransactionFilters, FetchResult, PageSizeOption, SortField, SortDirection } from "@/types/transaction";
 
 interface State {
-  data: FetchResult | null;
+  fetchResult: FetchResult | null;
   loading: boolean;
   error: string | null;
   page: number;
@@ -29,7 +29,7 @@ const PAGE_KEY = "page_size";
 
 function initialState(): State {
   return {
-    data: null,
+    fetchResult: null,
     loading: true,
     error: null,
     page: 1,
@@ -46,7 +46,7 @@ function reducer(state: State, action: Action): State {
     case "fetch_start":
       return { ...state, loading: true, error: null };
     case "fetch_ok":
-      return { ...state, loading: false, data: action.payload };
+      return { ...state, loading: false, fetchResult: action.payload };
     case "fetch_fail":
       return { ...state, loading: false, error: action.payload };
     case "update":
@@ -65,19 +65,15 @@ function reducer(state: State, action: Action): State {
 export function useTransactions() {
   const [state, dispatch] = useReducer(reducer, undefined, initialState);
 
-  // Lee localStorage después de montar - paginación
   useEffect(() => {
     try {
-      const v = localStorage.getItem(PAGE_KEY);
-      if (v === "25" || v === "50") {
-        dispatch({ t: "update", payload: { pageSize: Number(v) as PageSizeOption } });
+      const saved = localStorage.getItem(PAGE_KEY);
+      if (saved === "25" || saved === "50") {
+        dispatch({ t: "update", payload: { pageSize: Number(saved) as PageSizeOption } });
       }
-    } catch {
-      // ignore
-    }
+    } catch {}
   }, []);
 
-  // Fetch data — sort se aplica client-side
   useEffect(() => {
     let cancel = false;
 
@@ -98,25 +94,23 @@ export function useTransactions() {
     return () => { cancel = true; };
   }, [state.page, state.pageSize, state.filters, state.fetchId]);
 
-  // Aplicar sort client-side con useMemo
-  const sortedItems = useMemo(() => {
-    const items = state.data?.data ?? [];
+  const sortedData = useMemo(() => {
+    const items = state.fetchResult?.data ?? [];
     if (!state.sortField || !state.sortDirection) return items;
-  
-    return [...items].sort((a, b) => {
-      let cmp: number;
-      if (state.sortField === "date") {
-        cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
-      } else {
-        const valA = a.type === "debit" ? -a.amount : a.amount;
-        const valB = b.type === "debit" ? -b.amount : b.amount;
-        cmp = valA - valB;
-      }
-      return state.sortDirection === "desc" ? -cmp : cmp;
-    });
-  }, [state.data, state.sortField, state.sortDirection]);
 
-  // Persistir en localStorage
+    return [...items].sort((a, b) => {
+      let diferencia: number;
+      if (state.sortField === "date") {
+        diferencia = new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else {
+        const valorA = a.type === "debit" ? -a.amount : a.amount;
+        const valorB = b.type === "debit" ? -b.amount : b.amount;
+        diferencia = valorA - valorB;
+      }
+      return state.sortDirection === "desc" ? -diferencia : diferencia;
+    });
+  }, [state.fetchResult, state.sortField, state.sortDirection]);
+
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
   }, [state.pageSize]);
@@ -128,28 +122,23 @@ export function useTransactions() {
   );
 
   const reset = useCallback(() => dispatch({ t: "reset" }), []);
-
   const retry = useCallback(() => dispatch({ t: "retry" }), []);
 
   const toggleSort = useCallback(
     (field: SortField) => {
       if (state.sortField !== field) {
-        //  asc
         dispatch({ t: "update", payload: { sortField: field, sortDirection: "asc", page: 1 } });
       } else if (state.sortDirection === "asc") {
-        // desc
         dispatch({ t: "update", payload: { sortDirection: "desc" } });
       } else {
-        // limpia sort
         dispatch({ t: "clear_sort" });
       }
     },
     [state.sortField, state.sortDirection]
   );
 
-  // Construir data con items ordenados
-  const data = state.data
-    ? { ...state.data, items: sortedItems }
+  const data = state.fetchResult
+    ? { ...state.fetchResult, data: sortedData }
     : null;
 
   return {
