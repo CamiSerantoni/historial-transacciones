@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import { Download } from "lucide-react";
-import { fetchAllForExport } from "@/lib/fetchTransactions";
-import type { Transaction, TransactionFilters, SortField, SortDirection } from "@/types/transaction";
+import { fetchAllFilteredTransactions } from "@/lib/fetchTransactions";
+import type { Transaction, TransactionFilters } from "@/types/transaction";
 import { typeLabel, statusLabel } from "@/lib/formatters";
 
 interface Props {
   filters: TransactionFilters;
-  sortField: SortField | undefined;
-  sortDirection: SortDirection | undefined;
 }
 
 const HEADERS = [
@@ -43,19 +41,13 @@ function toRow(transaccion: Transaction): string {
   ].join(",");
 }
 
-export function TransactionExport({ filters, sortField, sortDirection }: Props) {
+export function TransactionExport({ filters }: Props) {
   const [exporting, setExporting] = useState(false);
 
   const onExport = async () => {
     setExporting(true);
     try {
-      const items = await fetchAllForExport({
-        page: 1,
-        pageSize: 9999,
-        filters,
-        sortField,
-        sortDirection,
-      });
+      const items = await fetchAllFilteredTransactions(filters);
 
       const rows = [HEADERS.join(","), ...items.map(toRow)];
       const csv = "\uFEFF" + rows.join("\n");

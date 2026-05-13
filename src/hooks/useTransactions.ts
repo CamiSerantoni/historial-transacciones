@@ -1,8 +1,8 @@
 "use client";
 
-import { useReducer, useEffect, useCallback, useMemo } from "react";
+import { useReducer, useEffect, useCallback } from "react";
 import { fetchTransactions } from "@/lib/fetchTransactions";
-import type { Transaction, TransactionFilters, FetchResult, PageSizeOption, SortField, SortDirection } from "@/types/transaction";
+import type { TransactionFilters, FetchResult, PageSizeOption, SortField, SortDirection } from "@/types/transaction";
 
 interface State {
   fetchResult: FetchResult | null;
@@ -96,23 +96,6 @@ export function useTransactions() {
     return () => { cancel = true; };
   }, [state.page, state.pageSize, state.filters, state.fetchId, state.sortField, state.sortDirection]);
 
-  const sortedData = useMemo(() => {
-    const items = state.fetchResult?.data ?? [];
-    if (!state.sortField || !state.sortDirection) return items;
-
-    return [...items].sort((a, b) => {
-      let diferencia: number;
-      if (state.sortField === "date") {
-        diferencia = new Date(a.date).getTime() - new Date(b.date).getTime();
-      } else {
-        const valorA = a.type === "debit" ? -a.amount : a.amount;
-        const valorB = b.type === "debit" ? -b.amount : b.amount;
-        diferencia = valorA - valorB;
-      }
-      return state.sortDirection === "desc" ? -diferencia : diferencia;
-    });
-  }, [state.fetchResult, state.sortField, state.sortDirection]);
-
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
   }, [state.pageSize]);
@@ -139,13 +122,9 @@ export function useTransactions() {
     [state.sortField, state.sortDirection]
   );
 
-  const data = state.fetchResult
-    ? { ...state.fetchResult, data: sortedData }
-    : null;
-
   return {
     ...state,
-    data,
+    data: state.fetchResult,
     update,
     reset,
     retry,

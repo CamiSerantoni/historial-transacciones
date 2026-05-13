@@ -130,8 +130,6 @@ function Dashboard() {
         <div className="flex justify-end mb-2">
           <TransactionExport
             filters={filters}
-            sortField={sortField}
-            sortDirection={sortDirection}
           />
         </div>
 

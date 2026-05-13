@@ -37,7 +37,10 @@ function applyFilters(transactions: Transaction[], filters: TransactionFilters):
   if (filters.search) {
     const busqueda = filters.search.toLowerCase();
     filtered = filtered.filter((transaccion) =>
-      transaccion.description.toLowerCase().includes(busqueda)
+      transaccion.description.toLowerCase().includes(busqueda) ||
+      transaccion.id.toLowerCase().includes(busqueda) ||
+      transaccion.accountOrigin.toLowerCase().includes(busqueda) ||
+      transaccion.accountDestination.toLowerCase().includes(busqueda)
     );
   }
 
