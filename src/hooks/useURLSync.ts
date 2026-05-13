@@ -20,6 +20,7 @@ export function useURLSync(
 
   useEffect(() => {
     const f: TransactionFilters = {};
+
     const search = sp.get("search");
     if (search) f.search = search;
 
@@ -51,9 +52,9 @@ export function useURLSync(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // escribir a URL cuando cambia el estado
   useEffect(() => {
     const params = new URLSearchParams();
+
     if (filters.search) params.set("search", filters.search);
     if (filters.type) params.set("type", filters.type);
     if (filters.status) params.set("status", filters.status);

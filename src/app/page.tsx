@@ -46,14 +46,14 @@ function maskAccount(account: string): string {
   return `●●●●-●●●●-${parts[2].slice(-4)}`;
 }
 
-function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortField: SortField; sortDirection: SortDirection }) {
-  if (sortField !== field) return <ArrowUpDown className="inline ml-1 h-3 w-3 opacity-40" />;
+function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortField: SortField | undefined; sortDirection: SortDirection | undefined }) {
+  if (sortField !== field || !sortDirection) return <ArrowUpDown className="inline ml-1 h-3 w-3 opacity-40" />;
   return sortDirection === "asc"
     ? <ArrowUp className="inline ml-1 h-3 w-3" />
     : <ArrowDown className="inline ml-1 h-3 w-3" />;
 }
 
-function TableHeaderRow({ sortField, sortDirection, onSort }: { sortField: SortField; sortDirection: SortDirection; onSort: (field: SortField) => void }) {
+function TableHeaderRow({ sortField, sortDirection, onSort }: { sortField: SortField | undefined; sortDirection: SortDirection | undefined; onSort: (field: SortField) => void }) {
   return (
     <TableRow className="bg-[#FC2B60] hover:bg-[#FC2B60] sticky top-0 z-10">
       <TableHead className="text-white font-semibold">
