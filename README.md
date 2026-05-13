@@ -48,20 +48,20 @@ Vista principal con todas las transacciones. Cada fila muestra fecha, descripci�
 - Transacciones fallidas con fila visiblemente diferente
 - Tooltip al hover sobre la cuenta origen muestra origen y destino completos
 
-### 🔍 Filtros
+###  Filtros
 
 Barra de filtros con búsqueda por descripción (debounce 300ms), rango de fechas, tipo, estado, moneda y rango de monto. Botón para limpiar todos los filtros. Los filtros se sincronizan con la URL como query params.
 
-### 📄 Paginación
+###  Paginación
 
 Paginación simulada server-side con selector de filas por página (10, 25, 50). 
 La preferencia de pageSize se persiste en `localStorage`.
 
-### 📥 Exportar CSV
+###  Exportar CSV
 
 Descarga `movimientos-{fecha}.csv` con los registros filtrados. Headers en español, montos como números planos y moneda en columna separada. BOM incluido para compatibilidad con Excel.
 
-### 🎨 Estados de UI
+###  Estados de UI
 
 | Estado | Implementación |
 |---|---|
