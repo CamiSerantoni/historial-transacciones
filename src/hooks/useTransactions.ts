@@ -83,6 +83,8 @@ export function useTransactions() {
       page: state.page,
       pageSize: state.pageSize,
       filters: state.filters,
+      sortField: state.sortField,
+      sortDirection: state.sortDirection,
     })
       .then((res) => {
         if (!cancel) dispatch({ kind: "fetch_ok", payload: res });
@@ -92,7 +94,7 @@ export function useTransactions() {
       });
 
     return () => { cancel = true; };
-  }, [state.page, state.pageSize, state.filters, state.fetchId]);
+  }, [state.page, state.pageSize, state.filters, state.fetchId, state.sortField, state.sortDirection]);
 
   const sortedData = useMemo(() => {
     const items = state.fetchResult?.data ?? [];

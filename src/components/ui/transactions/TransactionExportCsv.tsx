@@ -30,16 +30,16 @@ function escape(val: string): string {
   return val;
 }
 
-function toRow(tx: Transaction): string {
+function toRow(transaccion: Transaction): string {
   return [
-    escape(tx.date),
-    escape(tx.description),
-    escape(typeLabel(tx.type)),
-    escape(statusLabel(tx.status)),
-    String(tx.amount),
-    escape(tx.currency),
-    escape(tx.accountOrigin),
-    escape(tx.accountDestination),
+    escape(transaccion.date),
+    escape(transaccion.description),
+    escape(typeLabel(transaccion.type)),
+    escape(statusLabel(transaccion.status)),
+    String(transaccion.amount),
+    escape(transaccion.currency),
+    escape(transaccion.accountOrigin),
+    escape(transaccion.accountDestination),
   ].join(",");
 }
 

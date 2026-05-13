@@ -161,41 +161,41 @@ function Dashboard() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  (data?.data ?? []).map((tx: Transaction, i: number) => {
-                    const isFailed = tx.status === "failed";
+                  (data?.data ?? []).map((transaccion: Transaction, indice: number) => {
+                    const isFailed = transaccion.status === "failed";
                     return (
                       <TableRow
-                        key={tx.id}
-                        className={`${isFailed ? rowFailed : "hover:bg-zinc-50"} ${i % 2 === 1 ? "bg-zinc-50/50" : ""}`}
+                        key={transaccion.id}
+                        className={`${isFailed ? rowFailed : "hover:bg-zinc-50"} ${indice % 2 === 1 ? "bg-zinc-50/50" : ""}`}
                       >
                         <TableCell className={isFailed ? cellFailed : undefined}>
-                          {formatDate(tx.date)}
+                          {formatDate(transaccion.date)}
                         </TableCell>
                         <TableCell className={isFailed ? cellFailed : undefined}>
-                          {tx.description}
+                          {transaccion.description}
                         </TableCell>
                         <TableCell className={isFailed ? cellFailed : undefined}>
-                          {typeLabel(tx.type)}
+                          {typeLabel(transaccion.type)}
                         </TableCell>
                         <TableCell>
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFailed ? cellFailed : statusBadge[tx.status]}`}>
-                            {statusLabel(tx.status)}
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${isFailed ? cellFailed : statusBadge[transaccion.status]}`}>
+                            {statusLabel(transaccion.status)}
                           </span>
                         </TableCell>
-                        <TableCell className={`text-right font-mono tabular-nums ${isFailed ? cellFailed : amountColor[tx.type]}`}>
-                          {tx.type === "debit" ? "-" : "+"}
-                          {formatCurrency(tx.amount, tx.currency)}
+                        <TableCell className={`text-right font-mono tabular-nums ${isFailed ? cellFailed : amountColor[transaccion.type]}`}>
+                          {transaccion.type === "debit" ? "-" : "+"}
+                          {formatCurrency(transaccion.amount, transaccion.currency)}
                         </TableCell>
                         <TableCell>
                           <Tooltip>
                             <TooltipTrigger className="cursor-default">
                               <span className={isFailed ? cellFailed : "text-zinc-500"}>
-                                {maskAccount(tx.accountOrigin)}
+                                {maskAccount(transaccion.accountOrigin)}
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Origen: {tx.accountOrigin}</p>
-                              <p>Destino: {tx.accountDestination}</p>
+                              <p>Origen: {transaccion.accountOrigin}</p>
+                              <p>Destino: {transaccion.accountDestination}</p>
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>

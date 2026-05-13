@@ -4,23 +4,23 @@ import type { FetchParams, FetchResult, Transaction } from "@/types/transaction"
 function applyFilters(items: Transaction[], params: FetchParams): Transaction[] {
   const { filters } = params;
 
-  return items.filter((tx) => {
+  return items.filter((transaccion) => {
     if (filters.search) {
       const busqueda = filters.search.toLowerCase();
       if (
-        !tx.id.toLowerCase().includes(busqueda) &&
-        !tx.description.toLowerCase().includes(busqueda) &&
-        !tx.accountOrigin.toLowerCase().includes(busqueda) &&
-        !tx.accountDestination.toLowerCase().includes(busqueda)
+        !transaccion.id.toLowerCase().includes(busqueda) &&
+        !transaccion.description.toLowerCase().includes(busqueda) &&
+        !transaccion.accountOrigin.toLowerCase().includes(busqueda) &&
+        !transaccion.accountDestination.toLowerCase().includes(busqueda)
       ) return false;
     }
-    if (filters.type && tx.type !== filters.type) return false;
-    if (filters.status && tx.status !== filters.status) return false;
-    if (filters.currency && tx.currency !== filters.currency) return false;
-    if (filters.dateFrom && new Date(tx.date) < new Date(filters.dateFrom)) return false;
-    if (filters.dateTo && new Date(tx.date) > new Date(filters.dateTo + "T23:59:59")) return false;
-    if (filters.amountMin != null && tx.amount < filters.amountMin) return false;
-    if (filters.amountMax != null && tx.amount > filters.amountMax) return false;
+    if (filters.type && transaccion.type !== filters.type) return false;
+    if (filters.status && transaccion.status !== filters.status) return false;
+    if (filters.currency && transaccion.currency !== filters.currency) return false;
+    if (filters.dateFrom && new Date(transaccion.date) < new Date(filters.dateFrom)) return false;
+    if (filters.dateTo && new Date(transaccion.date) > new Date(filters.dateTo + "T23:59:59")) return false;
+    if (filters.amountMin != null && transaccion.amount < filters.amountMin) return false;
+    if (filters.amountMax != null && transaccion.amount > filters.amountMax) return false;
 
     return true;
   });

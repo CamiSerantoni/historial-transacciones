@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { FilterX } from "lucide-react";
 import type { TransactionFilters, TransactionType, TransactionStatus, Currency } from "@/types/transaction";
 import { CURRENCY_OPTIONS, TYPE_OPTIONS, STATUS_OPTIONS } from "@/types/transaction";
@@ -24,11 +24,17 @@ interface Props {
 
 export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
   const timer = useRef<NodeJS.Timeout | null>(null);
+  const [searchText, setSearchText] = useState(filters.search ?? "");
+
+  useEffect(() => {
+    if (!filters.search) setSearchText("");
+  }, [filters.search]);
 
   const set = (patch: Partial<TransactionFilters>) =>
     onChange({ ...filters, ...patch });
 
   const onSearch = (value: string) => {
+    setSearchText(value);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       set({ search: value || undefined });
@@ -42,7 +48,7 @@ export function TransactionFiltersBar({ filters, onChange, onClear }: Props) {
         <input
           type="text"
           placeholder="Descripción, ID, cuenta..."
-          defaultValue={filters.search ?? ""}
+          value={searchText}
           onChange={(e) => onSearch(e.target.value)}
           className="border border-zinc-600 rounded px-3 py-1.5 text-sm w-56 bg-zinc-800 text-white placeholder:text-zinc-500"
         />
