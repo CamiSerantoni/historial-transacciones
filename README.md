@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💳 Historial de Transacciones
+# Historial de Transacciones
 
 **Módulo de consulta de movimientos para operadores bancarios**
 
