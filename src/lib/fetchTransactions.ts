@@ -56,7 +56,7 @@ export async function fetchTransactions(params: FetchParams): Promise<FetchResul
   const paged = applyPage(sorted, params);
 
   return {
-    items: paged,
+    data: paged,
     total: filtered.length,
     page: params.page,
     pageSize: params.pageSize,

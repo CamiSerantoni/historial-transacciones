@@ -77,7 +77,7 @@ export function useTransactions() {
     }
   }, []);
 
-  // Fetch data — sort se aplica client-side, no se envía al servidor
+  // Fetch data — sort se aplica client-side
   useEffect(() => {
     let cancel = false;
 
@@ -98,23 +98,25 @@ export function useTransactions() {
     return () => { cancel = true; };
   }, [state.page, state.pageSize, state.filters, state.fetchId]);
 
-  // Aplicar sort client-side con useMemo — no re-fetch al ordenar
+  // Aplicar sort client-side con useMemo
   const sortedItems = useMemo(() => {
-    const items = state.data?.items ?? [];
+    const items = state.data?.data ?? [];
     if (!state.sortField || !state.sortDirection) return items;
-
-    return [...items].sort((a: Transaction, b: Transaction) => {
+  
+    return [...items].sort((a, b) => {
       let cmp: number;
       if (state.sortField === "date") {
         cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
       } else {
-        cmp = a.amount - b.amount;
+        const valA = a.type === "debit" ? -a.amount : a.amount;
+        const valB = b.type === "debit" ? -b.amount : b.amount;
+        cmp = valA - valB;
       }
       return state.sortDirection === "desc" ? -cmp : cmp;
     });
   }, [state.data, state.sortField, state.sortDirection]);
 
-  // Persistir pageSize en localStorage
+  // Persistir en localStorage
   useEffect(() => {
     localStorage.setItem(PAGE_KEY, String(state.pageSize));
   }, [state.pageSize]);

@@ -37,7 +37,7 @@ export type SortField = 'date' | 'amount';
 export type SortDirection = 'asc' | 'desc';
 
 export interface FetchResult {
-  items: Transaction[];
+  data: Transaction[];
   total: number;
   page: number;
   pageSize: number;
