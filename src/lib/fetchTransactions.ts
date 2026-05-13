@@ -1,81 +1,105 @@
-import { mockTransactions } from "@/data/mockTransactions";
-import type { FetchParams, FetchResult, Transaction } from "@/types/transaction";
+import type { FetchParams, FetchResult, Transaction, TransactionFilters } from '@/types/transaction';
+import { mockTransactions } from '@/data/mockTransactions';
 
-function applyFilters(items: Transaction[], params: FetchParams): Transaction[] {
-  const { filters } = params;
+function applyFilters(transactions: Transaction[], filters: TransactionFilters): Transaction[] {
+  let filtered = [...transactions];
 
-  return items.filter((transaccion) => {
-    if (filters.search) {
-      const busqueda = filters.search.toLowerCase();
-      if (
-        !transaccion.id.toLowerCase().includes(busqueda) &&
-        !transaccion.description.toLowerCase().includes(busqueda) &&
-        !transaccion.accountOrigin.toLowerCase().includes(busqueda) &&
-        !transaccion.accountDestination.toLowerCase().includes(busqueda)
-      ) return false;
-    }
-    if (filters.type && transaccion.type !== filters.type) return false;
-    if (filters.status && transaccion.status !== filters.status) return false;
-    if (filters.currency && transaccion.currency !== filters.currency) return false;
-    if (filters.dateFrom && new Date(transaccion.date) < new Date(filters.dateFrom)) return false;
-    if (filters.dateTo && new Date(transaccion.date) > new Date(filters.dateTo + "T23:59:59")) return false;
-    if (filters.amountMin != null && transaccion.amount < filters.amountMin) return false;
-    if (filters.amountMax != null && transaccion.amount > filters.amountMax) return false;
+  if (filters.dateFrom) {
+    const from = new Date(filters.dateFrom).getTime();
+    filtered = filtered.filter((transaccion) => new Date(transaccion.date).getTime() >= from);
+  }
 
-    return true;
-  });
+  if (filters.dateTo) {
+    const to = new Date(filters.dateTo + 'T23:59:59.999').getTime();
+    filtered = filtered.filter((transaccion) => new Date(transaccion.date).getTime() <= to);
+  }
+
+  if (filters.type) {
+    filtered = filtered.filter((transaccion) => transaccion.type === filters.type);
+  }
+
+  if (filters.status) {
+    filtered = filtered.filter((transaccion) => transaccion.status === filters.status);
+  }
+
+  if (filters.currency) {
+    filtered = filtered.filter((transaccion) => transaccion.currency === filters.currency);
+  }
+
+  if (filters.amountMin !== undefined) {
+    filtered = filtered.filter((transaccion) => transaccion.amount >= filters.amountMin!);
+  }
+
+  if (filters.amountMax !== undefined) {
+    filtered = filtered.filter((transaccion) => transaccion.amount <= filters.amountMax!);
+  }
+
+  if (filters.search) {
+    const busqueda = filters.search.toLowerCase();
+    filtered = filtered.filter((transaccion) =>
+      transaccion.description.toLowerCase().includes(busqueda)
+    );
+  }
+
+  return filtered;
 }
 
-function applySort(items: Transaction[], params: FetchParams): Transaction[] {
-  if (!params.sortField || !params.sortDirection) return items;
+function applySorting(
+  transactions: Transaction[],
+  sortField?: 'date' | 'amount',
+  sortDirection?: 'asc' | 'desc'
+): Transaction[] {
+  if (!sortField || !sortDirection) return transactions;
 
-  const { sortField, sortDirection } = params;
-
-  return [...items].sort((actual, siguiente) => {
-    let diferencia: number;
-    if (sortField === "date") {
+  return [...transactions].sort((actual, siguiente) => {
+    let diferencia = 0;
+    if (sortField === 'date') {
       diferencia = new Date(actual.date).getTime() - new Date(siguiente.date).getTime();
-    } else {
-      const valorA = actual.type === "debit" ? -actual.amount : actual.amount;
-      const valorB = siguiente.type === "debit" ? -siguiente.amount : siguiente.amount;
+    } else if (sortField === 'amount') {
+      const valorA = actual.type === 'debit' ? -actual.amount : actual.amount;
+      const valorB = siguiente.type === 'debit' ? -siguiente.amount : siguiente.amount;
       diferencia = valorA - valorB;
     }
-    return sortDirection === "desc" ? -diferencia : diferencia;
+    return sortDirection === 'asc' ? diferencia : -diferencia;
   });
 }
 
-function applyPage(items: Transaction[], params: FetchParams): Transaction[] {
-  const start = (params.page - 1) * params.pageSize;
-  return items.slice(start, start + params.pageSize);
+export function fetchTransactions(params: FetchParams): Promise<FetchResult> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() < 0.1) {
+        reject(new Error('Error de conexión. Intente nuevamente.'));
+        return;
+      }
+
+      const filtered = applyFilters(mockTransactions, params.filters);
+      const sorted = applySorting(filtered, params.sortField, params.sortDirection);
+
+      const total = sorted.length;
+      const totalPages = Math.ceil(total / params.pageSize);
+      const startIndex = (params.page - 1) * params.pageSize;
+      const data = sorted.slice(startIndex, startIndex + params.pageSize);
+
+      resolve({
+        data,
+        total,
+        page: params.page,
+        pageSize: params.pageSize,
+        totalPages,
+      });
+    }, 600);
+  });
 }
 
-export async function fetchTransactions(params: FetchParams): Promise<FetchResult> {
-  await new Promise((resolve) => setTimeout(resolve, 600));
-
-  if (Math.random() < 0.1) {
-    throw new Error("Error de conexión. Intente nuevamente.");
-  }
-
-  const filtered = applyFilters(mockTransactions, params);
-  const sorted = applySort(filtered, params);
-  const paged = applyPage(sorted, params);
-
-  return {
-    data: paged,
-    total: filtered.length,
-    page: params.page,
-    pageSize: params.pageSize,
-    totalPages: Math.ceil(filtered.length / params.pageSize),
-  };
-}
-
-export async function fetchAllForExport(params: FetchParams): Promise<Transaction[]> {
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  if (Math.random() < 0.1) {
-    throw new Error("Error de conexión al exportar. Intente nuevamente.");
-  }
-
-  const filtered = applyFilters(mockTransactions, params);
-  return applySort(filtered, params);
+export function fetchAllFilteredTransactions(filters: TransactionFilters): Promise<Transaction[]> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (Math.random() < 0.1) {
+        reject(new Error('Error de conexión al exportar. Intente nuevamente.'));
+        return;
+      }
+      const filtered = applyFilters(mockTransactions, filters);
+      resolve(filtered);
+    }, 300);
+  });
 }
