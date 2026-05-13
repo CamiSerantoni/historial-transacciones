@@ -6,12 +6,12 @@ function applyFilters(items: Transaction[], params: FetchParams): Transaction[] 
 
   return items.filter((tx) => {
     if (filters.search) {
-      const q = filters.search.toLowerCase();
+      const busqueda = filters.search.toLowerCase();
       if (
-        !tx.id.toLowerCase().includes(q) &&
-        !tx.description.toLowerCase().includes(q) &&
-        !tx.accountOrigin.toLowerCase().includes(q) &&
-        !tx.accountDestination.toLowerCase().includes(q)
+        !tx.id.toLowerCase().includes(busqueda) &&
+        !tx.description.toLowerCase().includes(busqueda) &&
+        !tx.accountOrigin.toLowerCase().includes(busqueda) &&
+        !tx.accountDestination.toLowerCase().includes(busqueda)
       ) return false;
     }
     if (filters.type && tx.type !== filters.type) return false;
@@ -31,11 +31,16 @@ function applySort(items: Transaction[], params: FetchParams): Transaction[] {
 
   const { sortField, sortDirection } = params;
 
-  return [...items].sort((a, b) => {
-    const cmp = sortField === "date"
-      ? new Date(a.date).getTime() - new Date(b.date).getTime()
-      : a.amount - b.amount;
-    return sortDirection === "desc" ? -cmp : cmp;
+  return [...items].sort((actual, siguiente) => {
+    let diferencia: number;
+    if (sortField === "date") {
+      diferencia = new Date(actual.date).getTime() - new Date(siguiente.date).getTime();
+    } else {
+      const valorA = actual.type === "debit" ? -actual.amount : actual.amount;
+      const valorB = siguiente.type === "debit" ? -siguiente.amount : siguiente.amount;
+      diferencia = valorA - valorB;
+    }
+    return sortDirection === "desc" ? -diferencia : diferencia;
   });
 }
 
@@ -45,7 +50,7 @@ function applyPage(items: Transaction[], params: FetchParams): Transaction[] {
 }
 
 export async function fetchTransactions(params: FetchParams): Promise<FetchResult> {
-  await new Promise((r) => setTimeout(r, 600));
+  await new Promise((resolve) => setTimeout(resolve, 600));
 
   if (Math.random() < 0.1) {
     throw new Error("Error de conexión. Intente nuevamente.");
@@ -65,7 +70,7 @@ export async function fetchTransactions(params: FetchParams): Promise<FetchResul
 }
 
 export async function fetchAllForExport(params: FetchParams): Promise<Transaction[]> {
-  await new Promise((r) => setTimeout(r, 300));
+  await new Promise((resolve) => setTimeout(resolve, 300));
 
   if (Math.random() < 0.1) {
     throw new Error("Error de conexión al exportar. Intente nuevamente.");

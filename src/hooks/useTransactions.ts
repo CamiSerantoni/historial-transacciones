@@ -17,13 +17,13 @@ interface State {
 }
 
 type Action =
-  | { t: "fetch_start" }
-  | { t: "fetch_ok"; payload: FetchResult }
-  | { t: "fetch_fail"; payload: string }
-  | { t: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">> }
-  | { t: "clear_sort" }
-  | { t: "reset" }
-  | { t: "retry" };
+  | { kind: "fetch_start" }
+  | { kind: "fetch_ok"; payload: FetchResult }
+  | { kind: "fetch_fail"; payload: string }
+  | { kind: "update"; payload: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">> }
+  | { kind: "clear_sort" }
+  | { kind: "reset" }
+  | { kind: "retry" };
 
 const PAGE_KEY = "page_size";
 
@@ -42,7 +42,7 @@ function initialState(): State {
 }
 
 function reducer(state: State, action: Action): State {
-  switch (action.t) {
+  switch (action.kind) {
     case "fetch_start":
       return { ...state, loading: true, error: null };
     case "fetch_ok":
@@ -69,7 +69,7 @@ export function useTransactions() {
     try {
       const saved = localStorage.getItem(PAGE_KEY);
       if (saved === "25" || saved === "50") {
-        dispatch({ t: "update", payload: { pageSize: Number(saved) as PageSizeOption } });
+        dispatch({ kind: "update", payload: { pageSize: Number(saved) as PageSizeOption } });
       }
     } catch {}
   }, []);
@@ -77,7 +77,7 @@ export function useTransactions() {
   useEffect(() => {
     let cancel = false;
 
-    dispatch({ t: "fetch_start" });
+    dispatch({ kind: "fetch_start" });
 
     fetchTransactions({
       page: state.page,
@@ -85,10 +85,10 @@ export function useTransactions() {
       filters: state.filters,
     })
       .then((res) => {
-        if (!cancel) dispatch({ t: "fetch_ok", payload: res });
+        if (!cancel) dispatch({ kind: "fetch_ok", payload: res });
       })
       .catch((err) => {
-        if (!cancel) dispatch({ t: "fetch_fail", payload: err.message });
+        if (!cancel) dispatch({ kind: "fetch_fail", payload: err.message });
       });
 
     return () => { cancel = true; };
@@ -117,21 +117,21 @@ export function useTransactions() {
 
   const update = useCallback(
     (patch: Partial<Pick<State, "page" | "pageSize" | "filters" | "sortField" | "sortDirection">>) =>
-      dispatch({ t: "update", payload: patch }),
+      dispatch({ kind: "update", payload: patch }),
     []
   );
 
-  const reset = useCallback(() => dispatch({ t: "reset" }), []);
-  const retry = useCallback(() => dispatch({ t: "retry" }), []);
+  const reset = useCallback(() => dispatch({ kind: "reset" }), []);
+  const retry = useCallback(() => dispatch({ kind: "retry" }), []);
 
   const toggleSort = useCallback(
     (field: SortField) => {
       if (state.sortField !== field) {
-        dispatch({ t: "update", payload: { sortField: field, sortDirection: "asc", page: 1 } });
+        dispatch({ kind: "update", payload: { sortField: field, sortDirection: "asc", page: 1 } });
       } else if (state.sortDirection === "asc") {
-        dispatch({ t: "update", payload: { sortDirection: "desc" } });
+        dispatch({ kind: "update", payload: { sortDirection: "desc" } });
       } else {
-        dispatch({ t: "clear_sort" });
+        dispatch({ kind: "clear_sort" });
       }
     },
     [state.sortField, state.sortDirection]

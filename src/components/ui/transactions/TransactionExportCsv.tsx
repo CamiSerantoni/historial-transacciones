@@ -63,10 +63,10 @@ export function TransactionExport({ filters, sortField, sortDirection }: Props) 
       const today = new Date().toISOString().split("T")[0];
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `movimientos-${today}.csv`;
-      a.click();
+      const enlace = document.createElement("a");
+      enlace.href = url;
+      enlace.download = `movimientos-${today}.csv`;
+      enlace.click();
       URL.revokeObjectURL(url);
     } catch {
       alert("Error al exportar. Intente nuevamente.");

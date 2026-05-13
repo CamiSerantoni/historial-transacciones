@@ -79,8 +79,8 @@ function TableHeaderRow({ sortField, sortDirection, onSort }: { sortField: SortF
 function Dashboard() {
   const { data, loading, error, page, pageSize, filters, sortField, sortDirection, update, retry, toggleSort } = useTransactions();
 
-  useURLSync(filters, page, pageSize, (f, p, ps) =>
-    update({ filters: f, page: p, pageSize: ps as 10 | 25 | 50 })
+  useURLSync(filters, page, pageSize, (filtrosUrl, paginaUrl, tamanoUrl) =>
+    update({ filters: filtrosUrl, page: paginaUrl, pageSize: tamanoUrl as 10 | 25 | 50 })
   );
 
   if (loading && !data) return (
@@ -111,7 +111,7 @@ function Dashboard() {
     </div>
   );
 
-  const hasFilters = Object.values(filters).some((v) => v !== undefined && v !== "");
+  const hasFilters = Object.values(filters).some((valor) => valor !== undefined && valor !== "");
 
   return (
     <TooltipProvider>
@@ -123,7 +123,7 @@ function Dashboard() {
 
         <TransactionFiltersBar
           filters={filters}
-          onChange={(f) => update({ filters: f, page: 1 })}
+          onChange={(nuevosFiltros) => update({ filters: nuevosFiltros, page: 1 })}
           onClear={() => update({ filters: {}, page: 1 })}
         />
 
@@ -213,8 +213,8 @@ function Dashboard() {
             page={page}
             totalPages={data.totalPages}
             pageSize={pageSize}
-            onPageChange={(p) => update({ page: p })}
-            onPageSizeChange={(s) => update({ pageSize: s, page: 1 })}
+            onPageChange={(nuevaPagina) => update({ page: nuevaPagina })}
+            onPageSizeChange={(nuevoTamano) => update({ pageSize: nuevoTamano, page: 1 })}
           />
         )}
       </main>
